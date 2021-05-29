@@ -57,9 +57,9 @@ for t in qbt_client.torrents_info():
             if u.isnumeric():
                 r = qbt_client.torrents_files(hash=t.hash)
                 torrent = [t.hash,t.size,t.name,tracker_convert(urlparse(t.tracker).hostname),1,t.ratio,t.category,t.num_seeds,t.seeding_time/86400]
-                torrent_list.append(torrent) if t not in torrent_list else torrent_list
+                torrent_list.append(torrent) if torrent not in torrent_list else torrent_list
                 torrent_list_file_size += t.size
-                torrent_list_to_check.append(h) if i.msg in ('unregistered torrent','Torrent is not found or it is awaiting moderation','002: Invalid InfoHash, Torrent not found') and h not in torrent_list_to_check else torrent_list_to_check 
+                torrent_list_to_check.append(torrent) if i.msg in ('unregistered torrent','Torrent is not found or it is awaiting moderation','002: Invalid InfoHash, Torrent not found') and h not in torrent_list_to_check else torrent_list_to_check 
     torrent = [t.hash,t.size,t.name,tracker_convert(urlparse(t.tracker).hostname),3,t.ratio,t.category,t.num_seeds,t.seeding_time/86400]
     if (t.ratio > 2 and t.category == 'archive' and t.seeding_time > (60*60*24*30)):
         torrent_list_to_check.append(torrent) if torrent not in torrent_list_to_check else torrent_list_to_check
