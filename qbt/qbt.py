@@ -9,6 +9,18 @@ def tracker_convert(tracker):
     a = trdict.get(tracker)
     return a
 
+def reason_str(reason_num, age, ratio):
+    reason_dict = {
+        1: f"due to bad tracker",
+        2: f"due to seeding for {age} days",
+        3: f"due to seeding for {age} days and {ratio} ratio",
+        4: f"due to seeding ratio of {ratio}"
+    }
+
+    b = reason_dict.get(reason_num)
+    return b
+
+
 trdict = {
   "localhost.stackoverflow.tech": "IPT",
   "tracker.beyond-hd.me": "BHD",
@@ -19,71 +31,60 @@ trdict = {
   "tracker.tleechreload.org": "TL",
   "tracker.torrentleech.org": "TL",
   "speed.connecting.center": "SCD",
-#  "tracker.tv-vault.me": "TVV", -- don't delete automatically
+  "tracker.tv-vault.me": "TVV", 
   "tracker.cinemaz.to": "CIN",
   "tracker.pixelhd.me": "PIX"
 }
 
+# Trackers not to be excluded
+tr_exclude = [
+    'TVV'
+]
+
 fn = os.path.basename(__file__)
-hl = [] #hash list
-hld = [] #hash list delete
-fl = [] #file list
-dlct = 0 #download count
-dlsz = 0 #download filesize
-hlsz = 0 #hl filesize
-tl = [] #create lis for torrents
-d = []
+torrent_list = [] 
+torrent_list_to_check = [] 
+del_ct = 0 
+del_size = 0 
+torrent_list_file_size = 0 
+torrent_list_ct = []
+hash_list_to_delete = [] 
 
-# for client in qbt_client.log.log_peers():
-#     print(client)
-
-
-for torrent in qbt_client.torrents_info():
-    d.append(tracker_convert(urlparse(torrent.tracker).hostname))
-    for i in torrent.trackers:
+for t in qbt_client.torrents_info():
+    torrent_list_ct.append(tracker_convert(urlparse(t.tracker).hostname))
+    for i in t.trackers:
         for u in str(i.tier):
             if u.isnumeric():
-                r = qbt_client.torrents_files(hash=torrent.hash)
-                for row in r:
-                    fl.append(row.name)
-                h = [torrent.hash,torrent.size,torrent.name,tracker_convert(urlparse(torrent.tracker).hostname),1,torrent.ratio,torrent.category,torrent.num_seeds,torrent.seeding_time/86400]
-                hl.append(h) if h not in hl else hl
-                hlsz += torrent.size
-                hld.append(h) if i.msg in ('unregistered torrent','Torrent is not found or it is awaiting moderation','002: Invalid InfoHash, Torrent not found') and h not in hld else hld 
-    if (torrent.ratio > 2 and torrent.category == 'archive' and torrent.seeding_time > (60*60*24*30)):
-        h = [torrent.hash,torrent.size,torrent.name,tracker_convert(urlparse(torrent.tracker).hostname),3,torrent.ratio,torrent.category,torrent.num_seeds,torrent.seeding_time/86400]
-        hld.append(h) if h not in hld else hld
-    elif torrent.seeding_time > 7776000:
-        h = [torrent.hash,torrent.size,torrent.name,tracker_convert(urlparse(torrent.tracker).hostname),2,torrent.ratio,torrent.category,torrent.num_seeds,torrent.seeding_time/86400]
-        hld.append(h) if h not in hld else hld
-    elif torrent.ratio > 10: # delete if > 2.0 and in archive or if 30+ days old 
-        h = [torrent.hash,torrent.size,torrent.name,tracker_convert(urlparse(torrent.tracker).hostname),4,torrent.ratio,torrent.category,torrent.num_seeds,torrent.seeding_time/86400]
-        hld.append(h) if h not in hld else hld
+                r = qbt_client.torrents_files(hash=t.hash)
+                torrent = [t.hash,t.size,t.name,tracker_convert(urlparse(t.tracker).hostname),1,t.ratio,t.category,t.num_seeds,t.seeding_time/86400]
+                torrent_list.append(torrent) if t not in torrent_list else torrent_list
+                torrent_list_file_size += t.size
+                torrent_list_to_check.append(h) if i.msg in ('unregistered torrent','Torrent is not found or it is awaiting moderation','002: Invalid InfoHash, Torrent not found') and h not in torrent_list_to_check else torrent_list_to_check 
+    torrent = [t.hash,t.size,t.name,tracker_convert(urlparse(t.tracker).hostname),3,t.ratio,t.category,t.num_seeds,t.seeding_time/86400]
+    if (t.ratio > 2 and t.category == 'archive' and t.seeding_time > (60*60*24*30)):
+        torrent_list_to_check.append(torrent) if torrent not in torrent_list_to_check else torrent_list_to_check
+    elif t.seeding_time > 7776000:
+        torrent_list_to_check.append(torrent) if torrent not in torrent_list_to_check else torrent_list_to_check
+    elif t.ratio > 10: # delete if > 2.0 and in archive or if 30+ days old 
+        torrent_list_to_check.append(torrent) if torrent not in torrent_list_to_check else torrent_list_to_check
 
-trackct = Counter(d)    #count of items for each tracker   
-hld1 = [] 
-for rw in hld:
-    if rw[4] == 1:
-        dm = 'to bad tracker'
-    if rw[4] == 2:
-        dm = f'to seeding for {round(rw[8])} days' 
-    if rw[4] == 3:
-        dm = f'to seeding for {round(rw[8])} days and {round(rw[5])} ratio'     
-    if rw[4] == 4:
-        dm = f'to seeding ratio of {round(rw[5])} '  
-    print(trackct[rw[3]])
-    if rw[4] == 1 or (rw[4] in (2,3,4) and trackct[rw[3]] > 2):
-        print(f'{ts()} - {fn} - {rw[2]} has been deleted due {dm}')
-        dlct += 1
-        dlsz += rw[1]
-        hld1.append(rw[0])
+trackct = Counter(torrent_list_ct)    #count of items for each tracker   
 
-if len(hld1) > 0:
-    qbt_client.torrents_delete(torrent_hashes=hld1,delete_files=True)
+for rw in torrent_list_to_check:
+    tracker, ratio, age, reason_num = rw[3], round(rw[5],2), round(rw[8]), rw[4]
+    del_reason = reason_str(reason_num, age, ratio) 
+    if (reason_num == 1 or (reason_num in [2,3,4] and trackct[rw[3]] > 2)) and tracker not in tr_exclude:
+        print(f'{ts()} - {fn} - {rw[2]} has been deleted {del_reason}')
+        del_ct += 1
+        del_size += rw[1]
+        hash_list_to_delete.append(rw[0])
 
-print(f'{ts()} - {fn} - Scanned a total of {len(hl)} files totalling {sizeof_fmt(hlsz)}')
+if len(hash_list_to_delete) > 0:
+    qbt_client.torrents_delete(torrent_hashes=hash_list_to_delete,delete_files=True)
 
-if len(hld) > 0: 
-    print(f'{ts()} - {fn} - Deleted a total of {dlct} file(s) with a total size of {sizeof_fmt(dlsz)}')
+print(f'{ts()} - {fn} - Scanned a total of {len(torrent_list)} files totalling {sizeof_fmt(torrent_list_file_size)}')
+
+if len(torrent_list_to_check) > 0: 
+    print(f'{ts()} - {fn} - Deleted a total of {del_ct} file(s) with a total size of {sizeof_fmt(del_size)}')
 else:
     print(f'{ts()} - {fn} - No stale files found to be deleted')
