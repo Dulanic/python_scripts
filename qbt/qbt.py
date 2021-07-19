@@ -11,10 +11,10 @@ def tracker_convert(tracker):
 
 def reason_str(reason_num, age, ratio):
     reason_dict = {
-        1: f"due to bad tracker",
-        2: f"due to seeding for {age} days",
-        3: f"due to seeding for {age} days and {ratio} ratio",
-        4: f"due to seeding ratio of {ratio}"
+        1: f"bad tracker",
+        2: f"seeding for {age} days",
+        3: f"seeding for {age} days and {ratio} ratio",
+        4: f"seeding ratio of {ratio}"
     }
 
     b = reason_dict.get(reason_num)
@@ -83,7 +83,7 @@ for rw in torrent_list_to_check:
     if tracker not in tr_exclude and trackct[rw[3]] > 2:
         del_reason = reason_str(reason_num, age, ratio) 
         if reason_num == 1 or reason_num in [2,3,4]:
-            print(f'{ts()} - {fn} - {rw[2]} has been deleted {del_reason}')
+            print(f'{ts()} - {fn} - {rw[2]} has been deleted due to {del_reason}')
             del_ct += 1
             del_size += rw[1]
             hash_list_to_delete.append(rw[0])
