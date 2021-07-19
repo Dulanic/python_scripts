@@ -26,7 +26,7 @@ trdict = {
   "tracker.beyond-hd.me": "BHD",
   "ssl.empirehost.me": "IPT",
   "routing.bgp.technology": "IPT",
-  "tracker.gazellegames.net": "GGT",
+  "tracker.gazellegames.net": "GGN",
   "tracker.privatehd.to": "PHD",
   "tracker.tleechreload.org": "TL",
   "tracker.torrentleech.org": "TL",
@@ -43,7 +43,7 @@ trdict = {
 # Trackers not to be excluded
 tr_exclude = [
     'TVV',
-    'GGT',
+    'GGN',
     'ABM'
 ]
 
