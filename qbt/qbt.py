@@ -33,12 +33,18 @@ trdict = {
   "speed.connecting.center": "SCD",
   "tracker.tv-vault.me": "TVV", 
   "tracker.cinemaz.to": "CIN",
-  "tracker.pixelhd.me": "PIX"
+  "tracker.pixelhd.me": "PIX",
+  "abtorrents.me": "ABM",
+  "tt.jumbohostpro.eu": "PHD",
+  "tracker.alpharatio.cc": "AR",
+  "t.connecting.center": "PHD"
 }
 
 # Trackers not to be excluded
 tr_exclude = [
-    'TVV'
+    'TVV',
+    'GGT',
+    'ABM'
 ]
 
 fn = os.path.basename(__file__)
@@ -59,8 +65,10 @@ for t in qbt_client.torrents_info():
                 torrent = [t.hash,t.size,t.name,tracker_convert(urlparse(t.tracker).hostname),1,t.ratio,t.category,t.num_seeds,t.seeding_time/86400]
                 torrent_list.append(torrent) if torrent not in torrent_list else torrent_list
                 torrent_list_file_size += t.size
-                torrent_list_to_check.append(torrent) if i.msg in ('unregistered torrent','Torrent is not found or it is awaiting moderation','002: Invalid InfoHash, Torrent not found') and h not in torrent_list_to_check else torrent_list_to_check 
+                torrent_list_to_check.append(torrent) if i.msg in ('unregistered torrent','Torrent is not found or it is awaiting moderation','002: Invalid InfoHash, Torrent not found') and torrent not in torrent_list_to_check else torrent_list_to_check 
     torrent = [t.hash,t.size,t.name,tracker_convert(urlparse(t.tracker).hostname),3,t.ratio,t.category,t.num_seeds,t.seeding_time/86400]
+    #if torrent[3] == None:
+    #    print(torrent)
     if (t.ratio > 2 and t.category == 'archive' and t.seeding_time > (60*60*24*30)):
         torrent_list_to_check.append(torrent) if torrent not in torrent_list_to_check else torrent_list_to_check
     elif t.seeding_time > 7776000:
@@ -72,12 +80,13 @@ trackct = Counter(torrent_list_ct)    #count of items for each tracker
 
 for rw in torrent_list_to_check:
     tracker, ratio, age, reason_num = rw[3], round(rw[5],2), round(rw[8]), rw[4]
-    del_reason = reason_str(reason_num, age, ratio) 
-    if (reason_num == 1 or (reason_num in [2,3,4] and trackct[rw[3]] > 2)) and tracker not in tr_exclude:
-        print(f'{ts()} - {fn} - {rw[2]} has been deleted {del_reason}')
-        del_ct += 1
-        del_size += rw[1]
-        hash_list_to_delete.append(rw[0])
+    if tracker not in tr_exclude and trackct[rw[3]] > 2:
+        del_reason = reason_str(reason_num, age, ratio) 
+        if reason_num == 1 or reason_num in [2,3,4]:
+            print(f'{ts()} - {fn} - {rw[2]} has been deleted {del_reason}')
+            del_ct += 1
+            del_size += rw[1]
+            hash_list_to_delete.append(rw[0])
 
 if len(hash_list_to_delete) > 0:
     qbt_client.torrents_delete(torrent_hashes=hash_list_to_delete,delete_files=True)

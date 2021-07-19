@@ -21,7 +21,7 @@ def tiny_file_rename(nn, dl_folder):
     os.rename(os.path.join(dl_folder, filename), os.path.join(dl_folder, nn))
 
 
-cur.execute("SELECT case when count(*) = 0 then '2019-08-01' else max(startdatetime) - INTERVAL '1 DAY'  end FROM public.coserv_cost;"            )
+cur.execute("SELECT case when count(*) = 0 then '2019-08-01' else max(startdatetime) - INTERVAL '1 DAY'  end FROM public.coserv_cost;")
 max_dt = cur.fetchone()[0]
 start_dt = str(int(max_dt.timestamp())) + '000'
 end_dt = str(int(t0)) + '000'

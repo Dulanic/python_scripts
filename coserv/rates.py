@@ -3,6 +3,7 @@ import requests
 import lxml.html as lh
 import pandas as pd
 from dateutil.parser import parse
+import re
 
 def is_date(string, fuzzy=False):
     """
@@ -30,15 +31,21 @@ tr_elements = doc.xpath('//tr')
 c = 0
 
 i = ['Base rate per kWh', 'First 700 kWh', 'MINUS the PCRF', 'Next 300 kWh', 'Over 1000 kWh']
-
+#monthly_cost = 
 
 
 #For each row, store each first element (header) and an empty list
 for t in tr_elements:
     for row in t:
+        a = t.text_content()
+        h = re.search("(?:[\£\$\€]{1}[,\d]+\.?\d*)",a)
+        j = re.findall("(?:[\£\$\€]{1}[,\d]+\.?\d*)",a)
+        if re.findall("(?:[\£\$\€]{1}[,\d]+\.?\d*)",a):
+            print(1)
+
         if is_date(t.text_content()):
             mnth = parse(t.text_content())
-        a = t.text_content()
+
         if a:
             lst = a.splitlines()
             for r in lst:
@@ -55,7 +62,7 @@ for t in tr_elements:
                         if 'PCRF' in label:
                             try:
                                 pcrf = float(r.lstrip('$'))
-                                if pcrf is not None:
+#                                if pcrf is not None:
 
                             except Exception:
                                 pass
@@ -69,4 +76,3 @@ for t in tr_elements:
             c = 0
             pcrf = None
             price = None
- 

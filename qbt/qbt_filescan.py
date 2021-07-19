@@ -23,6 +23,7 @@ if len(tl) < 2:
 for sdir in ['sonarr','radarr','radarr4k','archive']:
     for r, d, f in os.walk(pathroot+sdir):
         for file in f:
+            a = os.path.join(r, file)
             if os.path.isfile(os.path.join(r, file)) and os.path.join(r, file) not in tl:
                 fn = os.path.join(r, file)
                 fs = os.stat(fn).st_size
