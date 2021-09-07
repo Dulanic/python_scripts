@@ -3,10 +3,10 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import chromedriver_autoinstaller
+#import chromedriver_autoinstaller
 from settings import ConfigSet
 
-chromedriver_autoinstaller.install()
+#chromedriver_autoinstaller.install()
 
 # Set chome options
 chrome_options = Options()
