@@ -1,11 +1,12 @@
 #!/usr/bin/python3
-import os
+import sys, os
 from functions import ts, sizeof_fmt, qbt_client
 
 pathroot = '/mnt/btrfs/downloads/torrent/'
 sd = 0
 ds = 0
 tl = []
+fn = os.path.basename(__file__)
 
 # Load list of all files in qbt
 for torrent in qbt_client.torrents_info():
@@ -33,6 +34,6 @@ for sdir in ['sonarr','radarr','radarr4k','archive']:
                 print(f'{ts()} - Deleted - {fn} - {sizeof_fmt(fs)}')
 
 if sd==0:
-    print(f'{ts()} - No leftover files found.')
+    print(f'{ts()} - {fn} - No leftover files found.')
 else:
-    print(f'{ts()} - Deleted a total of {sd} leftover file(s) totaling {sizeof_fmt(ds)} ')
+    print(f'{ts()} - {fn} - Deleted a total of {sd} leftover file(s) totaling {sizeof_fmt(ds)} ')
