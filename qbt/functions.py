@@ -1,8 +1,9 @@
-import datetime
+from datetime import datetime
+from zoneinfo import ZoneInfo
 import qbittorrentapi
 
 def ts():
-    date_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    date_time = datetime.now().astimezone(ZoneInfo("America/Chicago")).strftime("%Y-%m-%d %H:%M:%S")
     return date_time
     
 def sizeof_fmt(num, suffix='B'):

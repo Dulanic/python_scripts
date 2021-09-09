@@ -2,13 +2,14 @@
 import requests
 import json
 from decouple import config
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import pymongo
-import sys, os
+import os
 
 
 def ts():
-    date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    date_time = datetime.now().astimezone(ZoneInfo("America/Chicago")).strftime("%Y-%m-%d %H:%M:%S")
     return date_time
 
 ak1 = config('ak1')
@@ -19,7 +20,7 @@ fn = os.path.basename(__file__)
 myclient = pymongo.MongoClient('mongodb://192.168.2.155:27017/')
 mydb = myclient['weather']
 mycol = mydb['hourly']
-ct = 0
+ins = upd = mat = ct = 0
 
 start_dt = datetime.now() + timedelta(hours=-120)
 
@@ -35,6 +36,13 @@ for single_date in (start_dt + timedelta(n) for n in range(6)):
     for row in wjson['hourly']:
         ct += 1
         a = row
-        i = mycol.update_one({'dt': row['dt']}, {'$set': row}, upsert=True)
+        g = mycol.update_one({'dt': row['dt']}, {'$set': row}, upsert=True)
+        if g.matched_count == 1 and g.modified_count == 0:
+            mat += 1
+        elif g.matched_count == 0 and g.modified_count == 1:
+            upd += 1
+        elif g.matched_count == 0 and g.modified_count == 0: 
+            ins +=1
 
-print(f'{ts()} - {fn} - Updated {ct} weather records.')
+
+print(f'{ts()} - {fn} - Inserted {ins} and Updated {upd} out of {ct} weather records.')

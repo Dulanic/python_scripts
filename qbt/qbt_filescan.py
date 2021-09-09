@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import sys, os
+import os
 from functions import ts, sizeof_fmt, qbt_client
 
 pathroot = '/mnt/btrfs/downloads/torrent/'
