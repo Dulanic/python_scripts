@@ -1,5 +1,5 @@
 from datetime import datetime
-from chrome import driver, WebDriverWait, EC, By
+from chrome import driver
 from db import cur, conn
 
 try:
@@ -21,13 +21,14 @@ try:
 except: 
     driver.quit()
 
+driver.quit()
+
 peakmnth1 = datetime.strptime(a[2], '%B %Y')
 peakmnth2 = datetime.strptime(a[10], '%B %Y')
 peakkwh1 = a[5].lstrip()[3:11]
 peakkwh2 = a[13].lstrip()[3:11]
 offpeakkwh1 = a[6].lstrip()[16:25]
 offpeakkwh2 = a[14].lstrip()[16:25]
-driver.quit()
 
 # Insert values 
 values1 = peakmnth1.year, peakmnth1.month, stdmnth1kwh, offpeakkwh1, peakkwh1
