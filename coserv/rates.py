@@ -37,7 +37,8 @@ values2 = peakmnth2.year, peakmnth2.month, stdmnth2kwh, offpeakkwh2, peakkwh2
 query = """INSERT INTO public.rates(
 	yr, mnth, reg_rate, off_peak_use_rate, peak_use_rate)
 	VALUES (%s, %s, %s, %s, %s)
-    ON CONFLICT DO NOTHING;"""
+    ON CONFLICT (yr, mnth) DO UPDATE SET
+        reg_rate = excluded.reg_rate, off_peak_use_rate = excluded.off_peak_use_rate, peak_use_rate = excluded.peak_use_rate ;"""
 cur.execute(query, values1)
 cur.execute(query, values2)
 conn.commit()
