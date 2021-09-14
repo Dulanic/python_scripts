@@ -3,6 +3,7 @@ from settings import timestamp, ConfigSet, cleardir
 from chrome import driver, WebDriverWait, EC, By
 from db import cur, conn
 import datetime, time
+from datetime import datetime as dt
 from zoneinfo import ZoneInfo
 import os.path
 from pathlib import Path
@@ -13,7 +14,7 @@ t0 = time.time()
 cleardir(getattr(ConfigSet,'dl_folder'))
 
 def ts():
-    date_time = datetime.now().astimezone(ZoneInfo("America/Chicago")).strftime("%Y-%m-%d %H:%M:%S")
+    date_time = dt.now().astimezone(ZoneInfo("America/Chicago")).strftime("%Y-%m-%d %H:%M:%S")
     return date_time
 
 def every_downloads_chrome(driver):
@@ -39,14 +40,7 @@ end_dt = str(int(t0)) + '000'
 url_dl = getattr(ConfigSet,'url') + '&startDate=' + start_dt + '&endDate=' + end_dt + getattr(ConfigSet,'url_trail')
 c_ct = 0
 fn = os.path.basename(__file__)
-
-try:
-   driver.get("https://support.coserv.com/hc/en-us/articles/360009093154-Standard-Residential-Rate")
-   for row in driver.find_elements_by_xpath ("""//*[@id="article-container"]/article/section[1]/div/div[1]/table/tbody"""):
-       cell = row.find_elements_by_tag_name("td")[1]
-       print(cell.text)
-except:    
-   driver.quit()
+v = []
 
 # Go to page to login
 try:
@@ -111,18 +105,14 @@ with open(getattr(ConfigSet,'file_loc'), 'r') as readFile:
 for item in coserv_list:
     c_ct += 1
     query = \
-        """WITH
-    update_cte AS (
-        UPDATE public.coserv SET "kWh" = %s WHERE dates = %s RETURNING 'updated'::text status
-    ),
-    insert_cte AS (
-        INSERT INTO public.coserv(dates, "kWh") SELECT %s, %s WHERE NOT EXISTS
-            (SELECT 1 FROM update_cte) RETURNING 'inserted'::text status
-    )
- (SELECT status FROM update_cte) UNION (SELECT status FROM insert_cte);"""
-    values = item  
-    v = values[1] +values[0]+values
-    cur.execute(query, v)
+        """INSERT INTO public.coserv(
+    dates, "kWh")
+    VALUES (%s, %s)
+    ON CONFLICT (dates)
+        DO UPDATE SET
+        "kWh" = excluded."kWh";"""
+    values = item
+    cur.execute(query, values)
     conn.commit()
 
 cur.execute("select max(left(dates,16)::timestamp) from coserv;")
