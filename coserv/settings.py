@@ -42,3 +42,4 @@ class ConfigSet(NamedTuple):
         tmp_file_loc = "/coserv/coservtmp.csv"
     elif platform == "win32":
         tmp_file_loc = 'C:\\coserv\\coservtmp.csv'
+

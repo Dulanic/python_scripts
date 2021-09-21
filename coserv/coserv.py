@@ -3,7 +3,6 @@ from settings import timestamp, ConfigSet, cleardir
 from chrome import driver, WebDriverWait, EC, By
 from db import cur, conn
 import datetime, time
-from datetime import datetime as dt
 from zoneinfo import ZoneInfo
 import os.path
 from pathlib import Path
@@ -14,7 +13,7 @@ t0 = time.time()
 cleardir(getattr(ConfigSet,'dl_folder'))
 
 def ts():
-    date_time = dt.now().astimezone(ZoneInfo("America/Chicago")).strftime("%Y-%m-%d %H:%M:%S")
+    date_time = datetime.now().astimezone(ZoneInfo("America/Chicago")).strftime("%Y-%m-%d %H:%M:%S")
     return date_time
 
 def every_downloads_chrome(driver):
@@ -25,7 +24,7 @@ def every_downloads_chrome(driver):
             .shadowRoot.getElementById('downloadsList').items;
         if (items.every(e => e.state === "COMPLETE"))
             return items.map(e => e.fileUrl || e.file_url);
-        """)    
+        """)
 
 def tiny_file_rename(nn, dl_folder):
     filename = max([f for f in os.listdir(dl_folder)], key=lambda xa: \
@@ -52,9 +51,8 @@ try:
     WebDriverWait(driver, 20).until(EC.title_is('SmartHub - Home'))
     driver.get(url_dl)
     paths = WebDriverWait(driver, 120, 1).until(every_downloads_chrome)
-    print(paths)
 except:
-    driver.quit()  
+    driver.quit()
 
 path = Path(getattr(ConfigSet,'dl_folder'))
 
@@ -99,8 +97,8 @@ with open(getattr(ConfigSet,'file_loc'), 'r') as readFile:
     for row in reader:
         coserv_list.append(row)
 
-[j.pop(3) for j in coserv_list] 
-[j.pop(2) for j in coserv_list] 
+[j.pop(3) for j in coserv_list]
+[j.pop(2) for j in coserv_list]
 
 for item in coserv_list:
     c_ct += 1

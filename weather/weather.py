@@ -2,9 +2,10 @@
 import requests
 import json
 from decouple import config
-from db import pguser, pgpass, conn, cur
+from db import conn, cur
 from datetime import datetime, timedelta, date
 import os
+
 
 def insert_weather():
     insert_query = '''INSERT INTO public.weather (date, temp, dwpt, rhum, prcp, wdir, wspd, pres, updte) 
@@ -42,10 +43,6 @@ start_date = date.today() - timedelta(6)
 # Set API values
 ak = config('ak')
 city = config('city')
-
-myclient = pymongo.MongoClient("mongodb://192.168.2.155:27017/")
-mydb = myclient["weather"]
-mycol = mydb["core"]
 
 fn = os.path.basename(__file__)
 # Loop through dates
