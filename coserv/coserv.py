@@ -50,7 +50,7 @@ try:
     button.click()
     WebDriverWait(driver, 20).until(EC.title_is('SmartHub - Home'))
     driver.get(url_dl)
-    paths = WebDriverWait(driver, 120, 1).until(every_downloads_chrome)
+    # WebDriverWait(driver, 120, 1).until(every_downloads_chrome)
 except:
     driver.quit()
 
@@ -60,7 +60,7 @@ for i in range(10):
     if any(path.glob('green*.csv')):
         break
     else:
-        if i == 10:
+        if i == 9:
             print (timestamp() + 'File Not found after 10 seconds')
             sys.exit()
         time.sleep(1)
