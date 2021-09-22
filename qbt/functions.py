@@ -13,4 +13,4 @@ def sizeof_fmt(num, suffix='B'):
         num /= 1024.0
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
-qbt_client = qbittorrentapi.Client(host='192.168.2.155', port=8089)
+qb = qbittorrentapi.Client(host='192.168.2.155', port=8089)

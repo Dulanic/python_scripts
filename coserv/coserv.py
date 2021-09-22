@@ -2,7 +2,8 @@
 from settings import timestamp, ConfigSet, cleardir
 from chrome import driver, WebDriverWait, EC, By
 from db import cur, conn
-import datetime, time
+import time
+from datetime import datetime as dt
 from zoneinfo import ZoneInfo
 import os.path
 from pathlib import Path
@@ -13,7 +14,7 @@ t0 = time.time()
 cleardir(getattr(ConfigSet,'dl_folder'))
 
 def ts():
-    date_time = datetime.now().astimezone(ZoneInfo("America/Chicago")).strftime("%Y-%m-%d %H:%M:%S")
+    date_time = dt.now().astimezone(ZoneInfo("America/Chicago")).strftime("%Y-%m-%d %H:%M:%S")
     return date_time
 
 def every_downloads_chrome(driver):
@@ -44,12 +45,16 @@ v = []
 # Go to page to login
 try:
     driver.get('https://coserv.smarthub.coop/Login.html')
+    driver.save_screenshot("screenshot.png")
     button = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.ID,'LoginSubmitButton')))
     driver.find_element_by_id('LoginUsernameTextBox').send_keys(getattr(ConfigSet,'clogin'))
     driver.find_element_by_id('LoginPasswordTextBox').send_keys(getattr(ConfigSet,'cpass'))
+    driver.save_screenshot("screenshot1.png")
     button.click()
     WebDriverWait(driver, 20).until(EC.title_is('SmartHub - Home'))
     driver.get(url_dl)
+    driver.save_screenshot("screenshot2.png")
+
     # WebDriverWait(driver, 120, 1).until(every_downloads_chrome)
 except:
     driver.quit()

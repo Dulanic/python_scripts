@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 import os
-import qbittorrentapi
-from functions import ts, sizeof_fmt, qbt_client
+from functions import ts, sizeof_fmt, qb
 from collections import Counter
 from urllib.parse import urlparse
 
@@ -56,16 +55,16 @@ torrent_list_file_size = 0
 torrent_list_ct = []
 hash_list_to_delete = [] 
 
-for t in qbt_client.torrents_info():
+for t in qb.torrents_info(torrent_hashes="8dbc7a618636a307ad1401b1ac989786bcf1c170"):
     torrent_list_ct.append(tracker_convert(urlparse(t.tracker).hostname))
     for i in t.trackers:
         for u in str(i.tier):
             if u.isnumeric():
-                r = qbt_client.torrents_files(hash=t.hash)
+                r = qb.torrents_files(hash=t.hash)
                 torrent = [t.hash,t.size,t.name,tracker_convert(urlparse(t.tracker).hostname),1,t.ratio,t.category,t.num_seeds,t.seeding_time/86400]
                 torrent_list.append(torrent) if torrent not in torrent_list else torrent_list
                 torrent_list_file_size += t.size
-                torrent_list_to_check.append(torrent) if i.msg in ('unregistered torrent','Torrent is not found or it is awaiting moderation','002: Invalid InfoHash, Torrent not found') and torrent not in torrent_list_to_check else torrent_list_to_check 
+                torrent_list_to_check.append(torrent) if (i.msg in ('unregistered torrent','Torrent is not found or it is awaiting moderation','002: Invalid InfoHash, Torrent not found','Unregistered torrent') or 'Season pack uploaded' in i.msg)  and torrent not in torrent_list_to_check else torrent_list_to_check 
     torrent = [t.hash,t.size,t.name,tracker_convert(urlparse(t.tracker).hostname),3,t.ratio,t.category,t.num_seeds,t.seeding_time/86400]
     #if torrent[3] == None:
     #    print(torrent)
@@ -80,7 +79,7 @@ trackct = Counter(torrent_list_ct)    #count of items for each tracker
 
 for rw in torrent_list_to_check:
     tracker, ratio, age, reason_num = rw[3], round(rw[5],2), round(rw[8]), rw[4]
-    if tracker not in tr_exclude and trackct[rw[3]] > 2:
+    if (tracker not in tr_exclude and trackct[rw[3]] > 2) or reason_num == 1:
         del_reason = reason_str(reason_num, age, ratio) 
         if reason_num == 1 or reason_num in [2,3,4]:
             print(f'{ts()} - {fn} - {rw[2]} has been deleted due to {del_reason}')
@@ -89,7 +88,7 @@ for rw in torrent_list_to_check:
             hash_list_to_delete.append(rw[0])
 
 if len(hash_list_to_delete) > 0:
-    qbt_client.torrents_delete(torrent_hashes=hash_list_to_delete,delete_files=True)
+    qb.torrents_delete(torrent_hashes=hash_list_to_delete,delete_files=True)
 
 print(f'{ts()} - {fn} - Scanned a total of {len(torrent_list)} files totalling {sizeof_fmt(torrent_list_file_size)}')
 
