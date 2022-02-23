@@ -1,8 +1,10 @@
 import psycopg2
-from decouple import config
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
-pguser = config('pguser')
-pgpass = config('pgpass')
+pguser = os.environ.get('pguser')
+pgpass = os.environ.get('pgpass')
 
 # Connect to your postgres DB
 conn = psycopg2.connect(dbname="bills", user=pguser,

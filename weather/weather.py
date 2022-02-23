@@ -1,11 +1,11 @@
-#!/usr/bin/env python3
+#!/home/dulanic/python_scripts/weather/venv/bin/python3.10
 import requests
 import json
-from decouple import config
 from db import conn, cur
 from datetime import datetime, timedelta, date
 import os
-
+from dotenv import load_dotenv
+load_dotenv()
 
 def insert_weather():
     insert_query = '''INSERT INTO public.weather (date, temp, dwpt, rhum, prcp, wdir, wspd, pres, updte) 
@@ -41,8 +41,8 @@ end_date = date.today() + timedelta(1)
 start_date = date.today() - timedelta(6)
 
 # Set API values
-ak = config('ak')
-city = config('city')
+ak = os.environ.get('ak')
+city = os.environ.get('city')
 
 fn = os.path.basename(__file__)
 # Loop through dates

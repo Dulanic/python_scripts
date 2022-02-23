@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/home/dulanic/python_scripts/qbt/venv/bin/python
 import os
 from functions import ts, sizeof_fmt, qb
 from collections import Counter
@@ -19,6 +19,7 @@ def reason_str(reason_num, age, ratio):
     b = reason_dict.get(reason_num)
     return b
 
+c = 1
 
 trdict = {
   "localhost.stackoverflow.tech": "IPT",
@@ -55,9 +56,11 @@ torrent_list_file_size = 0
 torrent_list_ct = []
 hash_list_to_delete = [] 
 
-for t in qb.torrents_info(torrent_hashes="8dbc7a618636a307ad1401b1ac989786bcf1c170"):
+for t in qb.torrents_info():
     torrent_list_ct.append(tracker_convert(urlparse(t.tracker).hostname))
     for i in t.trackers:
+        if i['url'] == 'https://tracker.beyond-hd.me:2053/announce/a2d9acc0ae9b1c63343defdaaa31ea5b':
+            c = c
         for u in str(i.tier):
             if u.isnumeric():
                 r = qb.torrents_files(hash=t.hash)

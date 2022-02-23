@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.9
+#!/home/dulanic/python_scripts/coserv/venv/bin/python3.10
 from settings import timestamp, ConfigSet, cleardir
 from chrome import driver, WebDriverWait, EC, By
 from db import cur, conn
@@ -47,17 +47,18 @@ try:
     driver.get('https://coserv.smarthub.coop/Login.html')
     driver.save_screenshot("screenshot.png")
     button = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.ID,'LoginSubmitButton')))
-    driver.find_element_by_id('LoginUsernameTextBox').send_keys(getattr(ConfigSet,'clogin'))
-    driver.find_element_by_id('LoginPasswordTextBox').send_keys(getattr(ConfigSet,'cpass'))
+    driver.find_element(By.ID,'LoginUsernameTextBox').send_keys(getattr(ConfigSet,'clogin'))
+    driver.find_element(By.ID,'LoginPasswordTextBox').send_keys(getattr(ConfigSet,'cpass'))
     driver.save_screenshot("screenshot1.png")
     button.click()
+    driver.save_screenshot("screenshot2.png")
     WebDriverWait(driver, 20).until(EC.title_is('SmartHub - Home'))
     driver.get(url_dl)
-    driver.save_screenshot("screenshot2.png")
-
-    # WebDriverWait(driver, 120, 1).until(every_downloads_chrome)
+    driver.save_screenshot("screenshot3.png")
 except:
     driver.quit()
+    print("Failed to pull CoServ data")
+    exit()
 
 path = Path(getattr(ConfigSet,'dl_folder'))
 

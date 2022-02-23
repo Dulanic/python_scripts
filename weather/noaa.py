@@ -22,6 +22,7 @@ mat = 0
 ct = 0
 
 
+
 myclient = pymongo.MongoClient('mongodb://192.168.2.155:27017/')
 mydb = myclient['weather']
 mycol = mydb['noaa']

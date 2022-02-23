@@ -1,7 +1,8 @@
-#!/usr/bin/python
+#!/home/dulanic/python_scripts/weather/venv/bin/python3.10
 import requests
 import json
-from decouple import config
+from dotenv import load_dotenv
+load_dotenv()
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 import pymongo
@@ -12,9 +13,9 @@ def ts():
     date_time = datetime.now().astimezone(ZoneInfo("America/Chicago")).strftime("%Y-%m-%d %H:%M:%S")
     return date_time
 
-ak1 = config('ak1')
-lat = config('lat')
-lon = config('lon')
+ak1 = os.environ.get('ak1')
+lat = os.environ.get('lat')
+lon = os.environ.get('lon')
 
 fn = os.path.basename(__file__)
 myclient = pymongo.MongoClient('mongodb://192.168.2.155:27017/')

@@ -1,4 +1,4 @@
-# #!/usr/bin/python3
+#!/usr/bin/python3
 import os
 from functions import ts, sizeof_fmt, qb
 
@@ -7,13 +7,18 @@ sd = 0
 ds = 0
 tl = []
 z = []
+b = []
 fn = os.path.basename(__file__)
-
+a = qb.torrents_info(status_filter='Errored')
+for torrent in a:
+    b.append(torrent)
+print(b)
+# Load list of all files in qbt
 for torrent in qb.torrents_info():
     for i in torrent.trackers:
         r = qb.torrents_files(hash=torrent.hash)
         for row in r:
-            ta = torrent.save_path+'/'+row.name
+            ta = torrent.save_path+row.name
             tl.append(ta) if ta not in tl else ta
 
 if len(tl) < 2:

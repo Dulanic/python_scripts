@@ -5,6 +5,8 @@ from typing import NamedTuple, List
 import os
 import glob
 import datetime
+from dotenv import load_dotenv
+load_dotenv()
 
 
 def find_files(filename, search_path):
@@ -22,10 +24,10 @@ def cleardir(path):
         os.remove(f)
 
 class ConfigSet(NamedTuple):
-    url = config('csrvurl')
-    url_trail = config('url_trail')
-    clogin = config('clogin')
-    cpass = config('cpass')
+    url = os.environ.get('csrvurl')
+    url_trail = os.environ.get('url_trail')
+    clogin = os.environ.get('clogin')
+    cpass = os.environ.get('cpass')
     nn = "coserv.csv"
     #If for download location 
     if platform in ("linux","linux2"):
@@ -42,4 +44,4 @@ class ConfigSet(NamedTuple):
         tmp_file_loc = "/coserv/coservtmp.csv"
     elif platform == "win32":
         tmp_file_loc = 'C:\\coserv\\coservtmp.csv'
-
+    
