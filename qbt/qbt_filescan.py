@@ -1,14 +1,15 @@
-# #!/usr/bin/python3
+#!/usr/bin/python3
 import os
 from functions import ts, sizeof_fmt, qb
 
-pathroot = '/mnt/btrfs/downloads/torrent/'
+d = '/mnt/btrfs/downloads/torrent/'
 sd = 0
 ds = 0
 tl = []
+dl = []
 z = []
 fn = os.path.basename(__file__)
-
+subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
 for torrent in qb.torrents_info():
     for i in torrent.trackers:
         r = qb.torrents_files(hash=torrent.hash)
@@ -21,8 +22,8 @@ if len(tl) < 2:
     quit()
 
 # Delete files not in list loaded from QBT
-for sdir in ['sonarr','radarr','radarr4k','archive','games','readarr','lidarr','books','audiobook']:
-    for r, d, f in os.walk(pathroot+sdir):
+for sdir in subdirs:
+    for r, d, f in os.walk(sdir):
         for file in f:
             a = os.path.join(r, file)
             if os.path.isfile(os.path.join(r, file)) and os.path.join(r, file) not in tl:
@@ -30,8 +31,12 @@ for sdir in ['sonarr','radarr','radarr4k','archive','games','readarr','lidarr','
                 fs = os.stat(dfn).st_size
                 sd += 1
                 ds += fs
-                os.remove(dfn)
+                dl.append(dfn)
                 print(f'{ts()} - {fn} - Deleted - {dfn} - {sizeof_fmt(fs)}')
+
+# Delete files from list
+for file in dl:
+    os.remove(file)
 
 if sd==0:
     print(f'{ts()} - {fn} - No leftover files found.')

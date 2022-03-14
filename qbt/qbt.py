@@ -59,8 +59,6 @@ hash_list_to_delete = []
 for t in qb.torrents_info():
     torrent_list_ct.append(tracker_convert(urlparse(t.tracker).hostname))
     for i in t.trackers:
-        if i['url'] == 'https://tracker.beyond-hd.me:2053/announce/a2d9acc0ae9b1c63343defdaaa31ea5b':
-            c = c
         for u in str(i.tier):
             if u.isnumeric():
                 r = qb.torrents_files(hash=t.hash)
